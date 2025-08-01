@@ -1,0 +1,1 @@
+ -pthread "C:/vcpkg-2025.07.25/installed/x64-mingw-static/lib/libpq.a" "C:/vcpkg-2025.07.25/installed/x64-mingw-static/lib/libssl.a" -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

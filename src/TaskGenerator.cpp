@@ -40,7 +40,7 @@ void TaskGenerator::set_difficulty(Difficulty new_difficulty)
     current_difficulty = new_difficulty;
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(size_t length)
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(size_t length) // принимает желаемую длину последовательности
 {
     const auto params = get_params_for_difficulty(current_difficulty);
     length = std::clamp(length, params.min_length, params.max_length);
@@ -71,7 +71,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(size_t len
                               : generate_word_sequence(length);
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_number_sequence(size_t length) const
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_number_sequence(size_t length) const //принимает количество чисел для генерации
 {
     std::vector<TaskItem> result;
     result.reserve(length);
@@ -79,7 +79,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_number_sequence(siz
     return result;
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_symbol_sequence(size_t length) const
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_symbol_sequence(size_t length) const //принимает количество символов для генерации
 {
     std::vector<TaskItem> result;
     result.reserve(length);
@@ -89,7 +89,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_symbol_sequence(siz
     return result;
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_word_sequence(size_t length) const
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_word_sequence(size_t length) const //принимает количество слов для генерации
 {
     std::vector<TaskItem> result;
     result.reserve(length);

@@ -1,6 +1,8 @@
 #include "..\include\RandomGenerators.hpp"
 
 #include <random>
+#include <algorithm>
+#include <iterator>
 
 namespace
 {

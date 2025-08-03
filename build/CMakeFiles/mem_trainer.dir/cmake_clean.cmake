@@ -1,8 +1,12 @@
 file(REMOVE_RECURSE
   "CMakeFiles/mem_trainer.dir/main.cpp.obj"
   "CMakeFiles/mem_trainer.dir/main.cpp.obj.d"
+  "CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj"
+  "CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj.d"
   "CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.obj"
   "CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.obj.d"
+  "CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj"
+  "CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj.d"
   "CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj"
   "CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj.d"
   "CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj"

@@ -86,26 +86,41 @@ CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.s"
 	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\EpicR\Desktop\mem_trainer\src\MainLoop.cpp -o CMakeFiles\mem_trainer.dir\src\MainLoop.cpp.s
 
-CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: CMakeFiles/mem_trainer.dir/flags.make
-CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: CMakeFiles/mem_trainer.dir/includes_CXX.rsp
-CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: C:/Users/EpicR/Desktop/mem_trainer/src/RandomGenerators.cpp
-CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: CMakeFiles/mem_trainer.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj"
-	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj -MF CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.obj.d -o CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.obj -c C:\Users\EpicR\Desktop\mem_trainer\src\RandomGenerators.cpp
+CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj: CMakeFiles/mem_trainer.dir/flags.make
+CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj: CMakeFiles/mem_trainer.dir/includes_CXX.rsp
+CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj: C:/Users/EpicR/Desktop/mem_trainer/src/DatabaseSync.cpp
+CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj: CMakeFiles/mem_trainer.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj -MF CMakeFiles\mem_trainer.dir\src\DatabaseSync.cpp.obj.d -o CMakeFiles\mem_trainer.dir\src\DatabaseSync.cpp.obj -c C:\Users\EpicR\Desktop\mem_trainer\src\DatabaseSync.cpp
 
-CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.i"
-	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\EpicR\Desktop\mem_trainer\src\RandomGenerators.cpp > CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.i
+CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.i"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\EpicR\Desktop\mem_trainer\src\DatabaseSync.cpp > CMakeFiles\mem_trainer.dir\src\DatabaseSync.cpp.i
 
-CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.s"
-	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\EpicR\Desktop\mem_trainer\src\RandomGenerators.cpp -o CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.s
+CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.s"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\EpicR\Desktop\mem_trainer\src\DatabaseSync.cpp -o CMakeFiles\mem_trainer.dir\src\DatabaseSync.cpp.s
+
+CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj: CMakeFiles/mem_trainer.dir/flags.make
+CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj: CMakeFiles/mem_trainer.dir/includes_CXX.rsp
+CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj: C:/Users/EpicR/Desktop/mem_trainer/src/Menu.cpp
+CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj: CMakeFiles/mem_trainer.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj -MF CMakeFiles\mem_trainer.dir\src\Menu.cpp.obj.d -o CMakeFiles\mem_trainer.dir\src\Menu.cpp.obj -c C:\Users\EpicR\Desktop\mem_trainer\src\Menu.cpp
+
+CMakeFiles/mem_trainer.dir/src/Menu.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mem_trainer.dir/src/Menu.cpp.i"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\EpicR\Desktop\mem_trainer\src\Menu.cpp > CMakeFiles\mem_trainer.dir\src\Menu.cpp.i
+
+CMakeFiles/mem_trainer.dir/src/Menu.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mem_trainer.dir/src/Menu.cpp.s"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\EpicR\Desktop\mem_trainer\src\Menu.cpp -o CMakeFiles\mem_trainer.dir\src\Menu.cpp.s
 
 CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj: CMakeFiles/mem_trainer.dir/flags.make
 CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj: CMakeFiles/mem_trainer.dir/includes_CXX.rsp
 CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj: C:/Users/EpicR/Desktop/mem_trainer/src/TaskGenerator.cpp
 CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj: CMakeFiles/mem_trainer.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj"
 	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj -MF CMakeFiles\mem_trainer.dir\src\TaskGenerator.cpp.obj.d -o CMakeFiles\mem_trainer.dir\src\TaskGenerator.cpp.obj -c C:\Users\EpicR\Desktop\mem_trainer\src\TaskGenerator.cpp
 
 CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.i: cmake_force
@@ -116,11 +131,26 @@ CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.s"
 	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\EpicR\Desktop\mem_trainer\src\TaskGenerator.cpp -o CMakeFiles\mem_trainer.dir\src\TaskGenerator.cpp.s
 
+CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: CMakeFiles/mem_trainer.dir/flags.make
+CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: CMakeFiles/mem_trainer.dir/includes_CXX.rsp
+CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: C:/Users/EpicR/Desktop/mem_trainer/src/RandomGenerators.cpp
+CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj: CMakeFiles/mem_trainer.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj -MF CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.obj.d -o CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.obj -c C:\Users\EpicR\Desktop\mem_trainer\src\RandomGenerators.cpp
+
+CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.i"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\EpicR\Desktop\mem_trainer\src\RandomGenerators.cpp > CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.i
+
+CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.s"
+	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\EpicR\Desktop\mem_trainer\src\RandomGenerators.cpp -o CMakeFiles\mem_trainer.dir\src\RandomGenerators.cpp.s
+
 CMakeFiles/mem_trainer.dir/main.cpp.obj: CMakeFiles/mem_trainer.dir/flags.make
 CMakeFiles/mem_trainer.dir/main.cpp.obj: CMakeFiles/mem_trainer.dir/includes_CXX.rsp
 CMakeFiles/mem_trainer.dir/main.cpp.obj: C:/Users/EpicR/Desktop/mem_trainer/main.cpp
 CMakeFiles/mem_trainer.dir/main.cpp.obj: CMakeFiles/mem_trainer.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/mem_trainer.dir/main.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/mem_trainer.dir/main.cpp.obj"
 	C:\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mem_trainer.dir/main.cpp.obj -MF CMakeFiles\mem_trainer.dir\main.cpp.obj.d -o CMakeFiles\mem_trainer.dir\main.cpp.obj -c C:\Users\EpicR\Desktop\mem_trainer\main.cpp
 
 CMakeFiles/mem_trainer.dir/main.cpp.i: cmake_force
@@ -134,24 +164,29 @@ CMakeFiles/mem_trainer.dir/main.cpp.s: cmake_force
 # Object files for target mem_trainer
 mem_trainer_OBJECTS = \
 "CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.obj" \
-"CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj" \
+"CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj" \
+"CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj" \
 "CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj" \
+"CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj" \
 "CMakeFiles/mem_trainer.dir/main.cpp.obj"
 
 # External object files for target mem_trainer
 mem_trainer_EXTERNAL_OBJECTS =
 
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.obj
-mem_trainer.exe: CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj
+mem_trainer.exe: CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj
+mem_trainer.exe: CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj
+mem_trainer.exe: CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/main.cpp.obj
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/build.make
 mem_trainer.exe: C:/vcpkg-2025.07.25/installed/x64-mingw-static/lib/libpq.a
 mem_trainer.exe: C:/vcpkg-2025.07.25/installed/x64-mingw-static/lib/libssl.a
+mem_trainer.exe: C:/vcpkg-2025.07.25/installed/x64-mingw-static/lib/libcrypto.a
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/linkLibs.rsp
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/objects1.rsp
 mem_trainer.exe: CMakeFiles/mem_trainer.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable mem_trainer.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\EpicR\Desktop\mem_trainer\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable mem_trainer.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\mem_trainer.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

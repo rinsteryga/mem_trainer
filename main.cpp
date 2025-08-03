@@ -1,14 +1,7 @@
-#include "MainLoop.hpp"
-
-#include <thread>
-#include <chrono>
+#include "include\MainLoop.hpp"
 
 int main(int argc, char** argv){
-    while (true)
-    {
-        print_auth();
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        break;
-    }
+    MainLoop app;
+    app.run();
     return 0;
 }

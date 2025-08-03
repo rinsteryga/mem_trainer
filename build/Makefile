@@ -152,6 +152,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/DatabaseSync.obj: src/DatabaseSync.cpp.obj
+.PHONY : src/DatabaseSync.obj
+
+# target to build an object file
+src/DatabaseSync.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj
+.PHONY : src/DatabaseSync.cpp.obj
+
+src/DatabaseSync.i: src/DatabaseSync.cpp.i
+.PHONY : src/DatabaseSync.i
+
+# target to preprocess a source file
+src/DatabaseSync.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.i
+.PHONY : src/DatabaseSync.cpp.i
+
+src/DatabaseSync.s: src/DatabaseSync.cpp.s
+.PHONY : src/DatabaseSync.s
+
+# target to generate assembly for a file
+src/DatabaseSync.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.s
+.PHONY : src/DatabaseSync.cpp.s
+
 src/MainLoop.obj: src/MainLoop.cpp.obj
 .PHONY : src/MainLoop.obj
 
@@ -175,6 +199,30 @@ src/MainLoop.s: src/MainLoop.cpp.s
 src/MainLoop.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.s
 .PHONY : src/MainLoop.cpp.s
+
+src/Menu.obj: src/Menu.cpp.obj
+.PHONY : src/Menu.obj
+
+# target to build an object file
+src/Menu.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj
+.PHONY : src/Menu.cpp.obj
+
+src/Menu.i: src/Menu.cpp.i
+.PHONY : src/Menu.i
+
+# target to preprocess a source file
+src/Menu.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/Menu.cpp.i
+.PHONY : src/Menu.cpp.i
+
+src/Menu.s: src/Menu.cpp.s
+.PHONY : src/Menu.s
+
+# target to generate assembly for a file
+src/Menu.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\mem_trainer.dir\build.make CMakeFiles/mem_trainer.dir/src/Menu.cpp.s
+.PHONY : src/Menu.cpp.s
 
 src/RandomGenerators.obj: src/RandomGenerators.cpp.obj
 .PHONY : src/RandomGenerators.obj
@@ -236,9 +284,15 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
+	@echo ... src/DatabaseSync.obj
+	@echo ... src/DatabaseSync.i
+	@echo ... src/DatabaseSync.s
 	@echo ... src/MainLoop.obj
 	@echo ... src/MainLoop.i
 	@echo ... src/MainLoop.s
+	@echo ... src/Menu.obj
+	@echo ... src/Menu.i
+	@echo ... src/Menu.s
 	@echo ... src/RandomGenerators.obj
 	@echo ... src/RandomGenerators.i
 	@echo ... src/RandomGenerators.s

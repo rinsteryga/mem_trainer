@@ -9,7 +9,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/EpicR/Desktop/mem_trainer/main.cpp" "CMakeFiles/mem_trainer.dir/main.cpp.obj" "gcc" "CMakeFiles/mem_trainer.dir/main.cpp.obj.d"
+  "C:/Users/EpicR/Desktop/mem_trainer/src/DatabaseSync.cpp" "CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj" "gcc" "CMakeFiles/mem_trainer.dir/src/DatabaseSync.cpp.obj.d"
   "C:/Users/EpicR/Desktop/mem_trainer/src/MainLoop.cpp" "CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.obj" "gcc" "CMakeFiles/mem_trainer.dir/src/MainLoop.cpp.obj.d"
+  "C:/Users/EpicR/Desktop/mem_trainer/src/Menu.cpp" "CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj" "gcc" "CMakeFiles/mem_trainer.dir/src/Menu.cpp.obj.d"
   "C:/Users/EpicR/Desktop/mem_trainer/src/RandomGenerators.cpp" "CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj" "gcc" "CMakeFiles/mem_trainer.dir/src/RandomGenerators.cpp.obj.d"
   "C:/Users/EpicR/Desktop/mem_trainer/src/TaskGenerator.cpp" "CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj" "gcc" "CMakeFiles/mem_trainer.dir/src/TaskGenerator.cpp.obj.d"
   )

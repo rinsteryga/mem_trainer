@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <cstdint>
 #include <cstddef>
 
 class TaskGenerator
@@ -14,21 +15,6 @@ public:
         MEDIUM,
         HARD
     };
-    using TaskItem = std::variant<uint16_t, uint32_t, float, char, std::string>;
-
-    TaskGenerator(Difficulty initial_difficulty = Difficulty::MEDIUM);
-
-    void set_difficulty(Difficulty new_difficulty);
-    Difficulty get_difficulty() const noexcept;
-
-    std::vector<TaskItem> generate_sequence(std::size_t length);
-
-private:
-    Difficulty current_difficulty;
-
-    std::vector<TaskItem> generate_number_sequence(std::size_t length) const;
-    std::vector<TaskItem> generate_symbol_sequence(std::size_t length) const;
-    std::vector<TaskItem> generate_word_sequence(std::size_t length) const;
 
     struct DifficultyParams
     {
@@ -38,5 +24,19 @@ private:
         bool mixed_types;
     };
 
+    using TaskItem = std::variant<uint16_t, uint32_t, float, char, std::string>;
+
+    TaskGenerator(Difficulty initial_difficulty = Difficulty::MEDIUM);
+
+    void set_difficulty(Difficulty new_difficulty);
+
+    std::vector<TaskItem> generate_sequence(std::size_t length);
     static DifficultyParams get_params_for_difficulty(Difficulty level) noexcept;
+
+private:
+    Difficulty current_difficulty;
+
+    std::vector<TaskItem> generate_number_sequence(std::size_t length) const;
+    std::vector<TaskItem> generate_symbol_sequence(std::size_t length) const;
+    std::vector<TaskItem> generate_word_sequence(std::size_t length) const;
 };

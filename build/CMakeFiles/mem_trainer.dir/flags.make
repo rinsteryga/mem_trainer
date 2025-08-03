@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = @CMakeFiles/mem_trainer.dir/includes_CXX.rsp
 
-CXX_FLAGS = -g -std=gnu++20
+CXX_FLAGS = -g -std=c++20
 

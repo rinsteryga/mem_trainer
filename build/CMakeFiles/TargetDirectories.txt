@@ -1,3 +1,0 @@
-C:/Users/EpicR/Desktop/mem_trainer/build/CMakeFiles/mem_trainer.dir
-C:/Users/EpicR/Desktop/mem_trainer/build/CMakeFiles/edit_cache.dir
-C:/Users/EpicR/Desktop/mem_trainer/build/CMakeFiles/rebuild_cache.dir

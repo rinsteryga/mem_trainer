@@ -9,114 +9,117 @@
 #include <thread>
 #include <chrono>
 #include <iterator>
+#include <cstdlib>
+#include <utility>
 
 MainLoop::MainLoop()
-    : db_sync("dbname=mem_trainer user=postgres password=ruslan host=localhost port=5432"),
+    : db_sync(),
       current_user_id(-1)
 {
-    db_connection = db_sync.get_connection();
-
-    if (!db_connection || PQstatus(db_connection.get()) != CONNECTION_OK)
+    try
     {
-        std::cerr << "Failed to connect to database. Exiting...\n";
+        if (!db_sync.connect())
+        {
+            throw std::runtime_error("Failed to connect to database");
+        }
+        auto menu = std::make_unique<Menu>();
+
+        menu->print_message("Connected to database successfully.\n");
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << "\n";
+        std::cerr << "Please check your config.ini file\n";
         exit(1);
     }
 }
+
 MainLoop::~MainLoop()
 {
-    if (db_connection)
+    if (db_sync.get_connection())
     {
-        PQfinish(db_connection.get());
+        PQfinish(db_sync.get_connection());
     }
 }
 
-bool MainLoop::connect_to_database()
+bool MainLoop::authenticate_user()
 {
-    const char *conninfo = "dbname=mem_trainer user=postgres password=ruslan host=localhost port=5432";
-    db_connection = std::shared_ptr<PGconn>(PQconnectdb(conninfo), PQfinish);
+    auto menu = std::make_unique<Menu>();
 
-    if (PQstatus(db_connection.get()) != CONNECTION_OK)
-    {
-        std::cerr << "Connection to database failed: " << PQerrorMessage(db_connection.get());
-        return false;
-    }
-
-    std::cout << "Connected to database successfully.\n";
-    return true;
-}
-
-bool MainLoop::authenticate_user() const
-{
     std::string username, password;
 
-    std::cout << "\nEnter username: ";
+    menu->print_message("\nEnter username: ");
     std::getline(std::cin, username);
 
-    std::cout << "Enter password: ";
+    menu->print_message("Enter password: ");
     std::getline(std::cin, password);
 
     const char *paramValues[2] = {username.c_str(), password.c_str()};
     int32_t paramLengths[2] = {static_cast<int32_t>(username.length()), static_cast<int32_t>(password.length())};
     int32_t paramFormats[2] = {0, 0}; // 0 = text
 
-    PGresult *res = PQexecParams(db_connection.get(),
+    PGresult *res = PQexecParams(db_sync.get_connection(),
                                  "SELECT id FROM users WHERE username = $1 AND password = $2",
                                  2, NULL, paramValues, paramLengths, paramFormats, 0);
 
     if (PQresultStatus(res) != PGRES_TUPLES_OK)
     {
-        std::cerr << "Authentication failed: " << PQerrorMessage(db_connection.get()) << "\n";
+        std::cerr << "Authentication failed: " << PQerrorMessage(db_sync.get_connection()) << "\n";
         PQclear(res);
         return false;
     }
 
     bool success = (PQntuples(res) == 1);
-    PQclear(res);
-
     if (success)
     {
-        std::cout << "Login successful!\n";
+        current_user_id = std::stoi(PQgetvalue(res, 0, 0));
+        menu->print_message("Login successful!\n");
     }
     else
     {
-        std::cout << "Invalid username or password.\n";
+        menu->print_message("Invalid username or password.\n");
     }
 
+    PQclear(res);
     return success;
 }
 
 bool MainLoop::register_user() const
 {
+    auto menu = std::make_unique<Menu>();
+
     std::string username, password;
 
-    std::cout << "\nEnter new username: ";
+    menu->print_message("\nEnter new username: ");
     std::getline(std::cin, username);
 
-    std::cout << "Enter new password: ";
+    menu->print_message("Enter new password: ");
     std::getline(std::cin, password);
 
     const char *paramValues[2] = {username.c_str(), password.c_str()};
     int32_t paramLengths[2] = {static_cast<int32_t>(username.length()), static_cast<int32_t>(password.length())};
     int32_t paramFormats[2] = {0, 0}; // 0 = text
 
-    PGresult *res = PQexecParams(db_connection.get(),
+    PGresult *res = PQexecParams(db_sync.get_connection(),
                                  "INSERT INTO users (username, password) VALUES ($1, $2)",
                                  2, NULL, paramValues, paramLengths, paramFormats, 0);
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        std::cerr << "Registration failed: " << PQerrorMessage(db_connection.get()) << "\n";
+        std::cerr << "Registration failed: " << PQerrorMessage(db_sync.get_connection()) << "\n";
         PQclear(res);
         return false;
     }
 
     PQclear(res);
-    std::cout << "Registration successful! You can now login.\n";
+    menu->print_message("Registration successful! You can now login.\n");
     return true;
 }
 
 void MainLoop::start_training()
 {
+    auto menu = std::make_unique<Menu>();
+
     int32_t difficulty_level{db_sync.get_user_difficulty(current_user_id)};
     TaskGenerator::Difficulty difficulty = static_cast<TaskGenerator::Difficulty>(difficulty_level);
 
@@ -127,12 +130,40 @@ void MainLoop::start_training()
     display_training_header(difficulty, sequence.size());
     display_sequence(sequence);
 
-    uint32_t memorization_time = 5 - static_cast<uint32_t>(difficulty);
-    std::cout << "\n\nYou have " << memorization_time << " seconds to remember...\n";
-    std::this_thread::sleep_for(std::chrono::seconds(memorization_time));
+    uint32_t memorization_time;
+    switch (difficulty)
+    {
+    case TaskGenerator::Difficulty::EASY:
+        memorization_time = 7;
+        break; // EASY
+    case TaskGenerator::Difficulty::MEDIUM:
+        memorization_time = 6;
+        break; // MEDIUM
+    case TaskGenerator::Difficulty::HARD:
+        memorization_time = 5;
+        break; // HARD
+    }
+    std::ostringstream oss;
+    oss << "\n\nYou have " << memorization_time << " seconds to remember...\n";
+    menu->print_message(oss.str());
+    while (memorization_time > 0)
+    {
+        std::ostringstream oss;
+        oss << "\rTime left: " << memorization_time << " seconds";
+        menu->print_message(oss.str());
+        std::cout << std::flush;
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        memorization_time--;
+    }
 
     clear_screen();
     auto user_answers = prompt_user_input();
+
+    if (user_answers.size() != sequence.size())
+    {
+        std::cerr << "Please enter exactly " << sequence.size() << " items." << std::endl;
+    }
 
     uint32_t correct = check_answers(sequence, user_answers);
     float success_rate = static_cast<float>(correct) / sequence.size();
@@ -146,43 +177,53 @@ void MainLoop::start_training()
 
 void MainLoop::display_training_header(TaskGenerator::Difficulty difficulty, size_t sequence_length)
 {
-    std::cout << "\n=== Memory Training ===\n";
-    std::cout << "Difficulty: ";
+    auto menu = std::make_unique<Menu>();
+    menu->print_message("\n=== Memory Training ===\n");
+    menu->print_message("Difficulty: ");
     switch (difficulty)
     {
     case TaskGenerator::Difficulty::EASY:
-        std::cout << "EASY";
+        menu->print_message("EASY");
         break;
     case TaskGenerator::Difficulty::MEDIUM:
-        std::cout << "MEDIUM";
+        menu->print_message("MEDIUM");
         break;
     case TaskGenerator::Difficulty::HARD:
-        std::cout << "HARD";
+        menu->print_message("HARD");
         break;
     }
-    std::cout << "\nRemember this sequence (" << sequence_length << " items):\n";
+    menu->print_message("\nRemember this sequence (" +
+                        std::to_string(sequence_length) +
+                        " items):\n");
 }
 
 void MainLoop::display_sequence(const std::vector<TaskGenerator::TaskItem> &sequence)
 {
+    auto menu = std::make_unique<Menu>();
     for (const auto &item : sequence)
     {
-        std::visit([](auto &&arg)
-                   { std::cout << arg << " "; }, item);
+        std::visit([&menu](auto &&arg)
+                   {
+            std::ostringstream oss;
+            oss << arg << " ";
+            menu->print_message(oss.str()); }, item);
     }
 }
 
 void MainLoop::clear_screen()
 {
-    for (unsigned short i{0}; i < 30; ++i)
-    {
-        std::cout << "\n";
-    }
+#ifdef _WIN32
+    system("cls"); // Windows
+#else
+    system("clear"); // Linux/macOS
+#endif
 }
 
 std::vector<std::string> MainLoop::prompt_user_input()
 {
-    std::cout << "Enter the sequence (separate items with spaces):\n";
+    auto menu = std::make_unique<Menu>();
+
+    menu->print_message("Enter the sequence (separate items with spaces):\n");
     std::string input;
     std::getline(std::cin, input);
 
@@ -195,26 +236,48 @@ uint32_t MainLoop::check_answers(const std::vector<TaskGenerator::TaskItem> &seq
                                  const std::vector<std::string> &user_answers) const
 {
     uint32_t correct = 0;
-    for (size_t i = 0; i < std::min(sequence.size(), user_answers.size()); ++i)
+    for (size_t i{0}; i < sequence.size(); ++i)
     {
-        bool is_correct = false;
-        std::visit([&](auto &&arg)
-                   {
-            using T = std::decay_t<decltype(arg)>;
-            try {
-                if constexpr (std::is_same_v<T, std::string>) {
-                    is_correct = (arg == user_answers[i]);
-                } else if constexpr (std::is_integral_v<T>) {
-                    is_correct = (arg == std::stoi(user_answers[i]));
-                } else if constexpr (std::is_floating_point_v<T>) {
-                    is_correct = (std::abs(arg - std::stof(user_answers[i])) < 0.001f);
-                }
-            } catch (...) {
-                is_correct = false;
-            } }, sequence[i]);
+        if (i < user_answers.size() && !user_answers[i].empty())
+        {
+            bool is_correct = false;
+            std::visit([&](auto &&arg)
+                       {
+                using T = std::decay_t<decltype(arg)>;
+                try {
+                    if constexpr (std::is_same_v<T, std::string>) {
+                        // сравнение строк (для слов)
+                        is_correct = (arg == user_answers[i]);
+                    } 
+                    else if constexpr (std::is_same_v<T, char>) {
+                        // сравнение символов (регистронезависимо)
+                        is_correct = (std::tolower(arg) == std::tolower(user_answers[i][0]));
+                    } 
+                    else if constexpr (std::is_integral_v<T>) {
+                        // сравнение целых чисел
+                        is_correct = (arg == std::stoi(user_answers[i]));
+                    } 
+                    else if constexpr (std::is_floating_point_v<T>) {
+                        // сравнение float с погрешностью
+                        const float user_value = std::stof(user_answers[i]);
+                        if (user_value == arg) 
+                        {
+                        is_correct = true;
+                        }
+                        else 
+                        {
+                            const float epsilon = 0.01f;
+                            is_correct = (std::abs(arg - user_value) < epsilon);
+                        }
+                    }
+                } 
+                catch (...) {
+                    is_correct = false;
+                } }, sequence[i]);
 
-        if (is_correct)
-            correct++;
+            if (is_correct)
+                correct++;
+        }
     }
     return correct;
 }
@@ -230,7 +293,7 @@ void MainLoop::save_training_results(size_t sequence_length, float success_rate,
         std::to_string(current_user_id).c_str(),
         std::to_string(sequence_length).c_str(),
         std::to_string(success_rate).c_str()};
-    PGresult *progress_res = PQexecParams(db_connection.get(),
+    PGresult *progress_res = PQexecParams(db_sync.get_connection(),
                                           "INSERT INTO user_progress (user_id, sequence_length, success_rate) VALUES ($1, $2, $3)",
                                           3, NULL, progress_params, NULL, NULL, 0);
     PQclear(progress_res);
@@ -247,65 +310,116 @@ void MainLoop::update_difficulty_if_needed(TaskGenerator::Difficulty difficulty,
     }
 }
 
-void MainLoop::print_results(uint32_t correct, size_t total, float success_rate,
+void MainLoop::print_results(uint32_t correct, std::size_t total, float success_rate,
                              uint32_t score, TaskGenerator::Difficulty difficulty) const
 {
-    std::cout << "\nTraining results:\n";
-    std::cout << "Correct: " << correct << "/" << total << "\n";
-    std::cout << "Success rate: " << std::fixed << std::setprecision(1) << (success_rate * 100) << "%\n";
-    std::cout << "Points earned: " << score << "\n";
+    auto menu = std::make_unique<Menu>();
+    bool level_increased = (success_rate > 0.75f &&
+                            difficulty != TaskGenerator::Difficulty::HARD);
+    bool suggest_easier = (success_rate < 0.3f &&
+                           difficulty != TaskGenerator::Difficulty::EASY);
 
-    if (success_rate > 0.75f && difficulty != TaskGenerator::Difficulty::HARD)
-    {
-        std::cout << "Congratulations! Difficulty level increased!\n";
-    }
-    else if (success_rate < 0.3f && difficulty != TaskGenerator::Difficulty::EASY)
-    {
-        std::cout << "Try easier difficulty next time!\n";
-    }
+    menu->print_training_results(correct, total, success_rate, score,
+                                 level_increased, suggest_easier);
 }
 
 void MainLoop::show_leaderboard() const
 {
-    PGresult *res = PQexec(db_connection.get(),
-                           "SELECT username, score FROM users ORDER BY score DESC LIMIT 10");
+    if (!db_sync.get_connection() || PQstatus(db_sync.get_connection()) != CONNECTION_OK)
+    {
+        std::cerr << "Failure: no connection to db.\n";
+        return;
+    }
+
+    // топ-10 игроков по очкам
+    const char *query =
+        "SELECT username, total_score FROM users "
+        "WHERE total_score > 0 "
+        "ORDER BY total_score DESC "
+        "LIMIT 10";
+
+    PGresult *res = PQexec(db_sync.get_connection(), query);
 
     if (PQresultStatus(res) != PGRES_TUPLES_OK)
     {
-        std::cerr << "Error getting leaderboard: " << PQerrorMessage(db_connection.get()) << "\n";
+        std::cerr << "Failure on getting leaderboard: " << PQerrorMessage(db_sync.get_connection()) << "\n";
         PQclear(res);
         return;
     }
 
-    std::cout << "\n======= Leaderboard =======\n";
+    // вывод leaderboard
+    auto menu = std::make_unique<Menu>();
     uint32_t rows = PQntuples(res);
-    for (short i{0}; i < rows; ++i)
+    std::vector<std::pair<std::string, std::string>> leaders;
+
+    if (rows == 0)
     {
-        std::cout << (i + 1) << ". " << PQgetvalue(res, i, 0)
-                  << " - Score: " << PQgetvalue(res, i, 1) << "\n";
+        menu->print_message("\nLeaderboard is clear. Be first!\n");
     }
-    std::cout << "===========================\n";
+    else
+    {
+        for (std::size_t i = 0; i < rows; ++i)
+        {
+            leaders.emplace_back(
+                PQgetvalue(res, i, 0), // username
+                PQgetvalue(res, i, 1)  // score
+            );
+        }
+        menu->print_leaderboard(leaders);
+    }
 
     PQclear(res);
 }
 
 void MainLoop::show_user_progress()
 {
+    auto menu = std::make_unique<Menu>();
     auto progress = db_sync.get_user_progress(current_user_id);
 
-    std::cout << "\n=== Your Training History ===\n";
+    menu->print_message("\n=== Your Training History ===\n");
     for (const auto &record : progress)
     {
-        std::cout << "Date: " << record.training_date.substr(0, 10) // Обрезаем время
-                  << " | Length: " << record.sequence_length
-                  << " items | Success: " << std::fixed << std::setprecision(1)
-                  << (record.success_rate * 100) << "%\n";
+        std::ostringstream oss;
+        oss << "Date: " << record.training_date.substr(0, 10)
+            << " | Length: " << record.sequence_length
+            << " items | Success: " << std::fixed << std::setprecision(1)
+            << (record.success_rate * 100) << "%";
+        menu->print_message(oss.str());
     }
 }
 
 void MainLoop::run()
 {
     auto menu = std::make_unique<Menu>();
+    bool authenticated = false;
+
+    while (!authenticated)
+    {
+        menu->print_auth_menu();
+
+        uint32_t choice;
+        std::cin >> choice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        switch (choice)
+        {
+        case 1:
+            if (authenticate_user())
+            {
+                authenticated = true;
+            }
+            break;
+        case 2:
+            register_user();
+            break;
+        case 3:
+            menu->print_message("Exiting...\n");
+            return;
+        default:
+            menu->print_message("Invalid choice. Try again.\n");
+        }
+    }
+
     while (true)
     {
         menu->print_main_menu();
@@ -323,12 +437,9 @@ void MainLoop::run()
             show_leaderboard();
             break;
         case 3:
-            show_user_progress();
-            break;
-        case 4:
             return;
         default:
-            std::cout << "Invalid choice. Try again.\n";
+            menu->print_message("Invalid choice. Try again.\n");
         }
     }
 }

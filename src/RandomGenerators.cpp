@@ -17,6 +17,10 @@ namespace
     T generate_integer(T min = std::numeric_limits<T>::min(),
                        T max = std::numeric_limits<T>::max())
     {
+        if constexpr (std::is_integral_v<T>)
+        {
+            max = std::min(max, static_cast<T>(99999)); // Не больше 5 цифр
+        }
         std::uniform_int_distribution<T> dist(min, max);
         return dist(get_generator());
     }
@@ -41,7 +45,7 @@ uint32_t NumberGenerator::generate_uint32() noexcept
 
 float NumberGenerator::generate_float() noexcept
 {
-    return generate_integer<float>(0.0f, 100.0f);
+    return std::round(generate_integer<float>(0.0f, 10.0f) * 1000) / 1000;
 }
 
 char SymbolGenerator::generate_char() noexcept

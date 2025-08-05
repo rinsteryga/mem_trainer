@@ -16,8 +16,7 @@ public:
     void run();
 
 private:
-    bool connect_to_database();
-    bool authenticate_user() const;
+    bool authenticate_user();
     bool register_user() const;
     void start_training();
     void show_leaderboard() const;
@@ -35,5 +34,5 @@ private:
     uint32_t calculate_score(float, TaskGenerator::Difficulty difficulty) const;
     DatabaseSync db_sync;
     std::shared_ptr<PGconn> db_connection;
-    uint32_t current_user_id;
+    int32_t current_user_id;
 };

@@ -17,14 +17,16 @@ class DatabaseSync
 {
 public:
     DatabaseSync(const std::string &conninfo);
+    DatabaseSync();
     ~DatabaseSync();
 
+    std::string parse_config_file();
     bool connect();
+    PGconn* get_connection() const;
     bool save_progress(uint32_t user_id, uint32_t sequence_length, float success_rate);
     bool update_difficulty(uint32_t user_id, uint32_t new_level);
     bool update_score(uint32_t user_id, uint32_t score_delta);
     std::vector<UserProgress> get_user_progress(uint32_t user_id);
-    std::shared_ptr<PGconn> get_connection() const { return db_connection; }
     int32_t get_user_difficulty(uint32_t user_id) const;
 
 private:

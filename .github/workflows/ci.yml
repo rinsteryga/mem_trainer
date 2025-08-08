@@ -24,13 +24,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+  
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libpq-dev libssl-dev g++ cmake
-        
+        sudo apt-get install -y \
+          libpq-dev \
+          libssl-dev \
+          openssl \
+          g++ \
+          cmake \
+          postgresql-server-dev-all
+    
     - name: Build
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -DCMAKE_BUILD_TYPE=Release \
+          -DOPENSSL_ROOT_DIR=/usr \
+          -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql
         cmake --build build --config Release

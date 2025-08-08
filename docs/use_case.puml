@@ -1,0 +1,37 @@
+@startuml memory_trainer_use_case
+
+left to right direction
+skinparam monochrome true
+skinparam usecase {
+  BackgroundColor #F9F9F9
+  BorderColor #333333
+}
+
+actor "Пользователь" as User <<Human>>
+
+rectangle "Memory Trainer" {
+  usecase "Авторизация" as UC1
+  usecase "Регистрация" as UC2
+  usecase "Начать тренировку" as UC3
+  usecase "Посмотреть прогресс" as UC4
+  usecase "Просмотреть таблицу лидеров" as UC5
+  
+  User --> UC1
+  User --> UC2
+  User --> UC3
+  User --> UC4
+  User --> UC5
+}
+
+' Расширенные сценарии
+usecase "Выбрать сложность" as UC6
+usecase "Запомнить последовательность" as UC7
+usecase "Ввести ответ" as UC8
+usecase "Получить результат" as UC9
+
+UC3 --> UC6
+UC3 --> UC7
+UC3 --> UC8
+UC3 --> UC9
+
+@enduml

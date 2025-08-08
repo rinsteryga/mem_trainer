@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 45  # Увеличиваем таймаут
     
     steps:
     - name: Checkout code
@@ -22,19 +22,23 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        # Очистка предыдущих установок
-        if (Test-Path "C:\vcpkg") { Remove-Item -Recurse -Force "C:\vcpkg" }
-        if (Test-Path "vcpkg.zip") { Remove-Item -Force "vcpkg.zip" }
+        # Устанавливаем только необходимые компоненты
+        $vcpkgRoot = "C:\vcpkg"
+        if (Test-Path $vcpkgRoot) { Remove-Item -Recurse -Force $vcpkgRoot }
         
-        # Скачивание и установка VCPKG
-        Invoke-WebRequest -Uri "https://github.com/microsoft/vcpkg/archive/refs/tags/2025.07.25.zip" -OutFile "vcpkg.zip"
-        Expand-Archive -Path "vcpkg.zip" -DestinationPath "C:\"
-        Rename-Item -Path "C:\vcpkg-2025.07.25" -NewName "C:\vcpkg"
-        & "C:\vcpkg\bootstrap-vcpkg.bat" -disableMetrics
-        & "C:\vcpkg\vcpkg.exe" install openssl:x64-mingw-static libpq:x64-mingw-static --triplet x64-mingw-static
+        # Используем более быстрый способ установки vcpkg
+        git clone https://github.com/microsoft/vcpkg $vcpkgRoot
+        & "$vcpkgRoot\bootstrap-vcpkg.bat" -disableMetrics
         
-        # Добавление VCPKG в PATH
-        echo "C:\vcpkg" | Out-File -FilePath $env:GITHUB_PATH -Append
+        # Устанавливаем только необходимые пакеты
+        & "$vcpkgRoot\vcpkg.exe" install \
+          openssl:x64-mingw-static \
+          libpq:x64-mingw-static \
+          --triplet x64-mingw-static \
+          --binarycaching \
+          --clean-after-build
+        
+        echo "$vcpkgRoot" | Out-File -FilePath $env:GITHUB_PATH -Append
         echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
     
     - name: Install dependencies (Linux)
@@ -52,7 +56,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: msys2/setup-msys2@v2
       with:
-        update: true
+        update: false  # Отключаем автоматическое обновление для экономии времени
         install: >-
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake

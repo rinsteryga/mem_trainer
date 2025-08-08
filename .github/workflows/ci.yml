@@ -12,6 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     
     steps:
     - name: Checkout code
@@ -19,25 +20,43 @@ jobs:
     
     - name: Setup VCPKG (Windows)
       if: matrix.os == 'windows-latest'
+      shell: pwsh
       run: |
-        Invoke-WebRequest -Uri "https://github.com/microsoft/vcpkg/archive/refs/tags/2025.07.25.zip" -OutFile "vcpkg.zip"
-        Expand-Archive -Path "vcpkg.zip" -DestinationPath "C:/"
-        Rename-Item -Path "C:/vcpkg-2025.07.25" -NewName "C:/vcpkg"
-        & "C:/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
-        & "C:/vcpkg/vcpkg.exe" install openssl:x64-mingw-static libpq:x64-mingw-static --triplet x64-mingw-static
+        # Очистка предыдущих установок
+        if (Test-Path "C:\vcpkg") { Remove-Item -Recurse -Force "C:\vcpkg" }
+        if (Test-Path "vcpkg.zip") { Remove-Item -Force "vcpkg.zip" }
         
+        # Скачивание и установка VCPKG
+        Invoke-WebRequest -Uri "https://github.com/microsoft/vcpkg/archive/refs/tags/2025.07.25.zip" -OutFile "vcpkg.zip"
+        Expand-Archive -Path "vcpkg.zip" -DestinationPath "C:\"
+        Rename-Item -Path "C:\vcpkg-2025.07.25" -NewName "C:\vcpkg"
+        & "C:\vcpkg\bootstrap-vcpkg.bat" -disableMetrics
+        & "C:\vcpkg\vcpkg.exe" install openssl:x64-mingw-static libpq:x64-mingw-static --triplet x64-mingw-static
+        
+        # Добавление VCPKG в PATH
+        echo "C:\vcpkg" | Out-File -FilePath $env:GITHUB_PATH -Append
+        echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+    
     - name: Install dependencies (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get update
-        sudo apt-get install -y libssl-dev libpq-dev g++ cmake
+        sudo apt-get update -q
+        sudo apt-get install -y --no-install-recommends \
+          libssl-dev \
+          libpq-dev \
+          g++ \
+          cmake \
+          ninja-build
         
     - name: Setup MinGW (Windows)
       if: matrix.os == 'windows-latest'
       uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: "mingw-w64-x86_64-gcc cmake"
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-ninja
         
     - name: Configure CMake
       shell: bash
@@ -45,25 +64,30 @@ jobs:
         mkdir -p build
         cd build
         if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-static -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/g++.exe
+          cmake .. -G "Ninja" \
+            -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake \
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
+            -DCMAKE_C_COMPILER=gcc \
+            -DCMAKE_CXX_COMPILER=g++ \
+            -DCMAKE_MAKE_PROGRAM=ninja
         else
-          cmake ..
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release
         fi
         
     - name: Build
       shell: bash
       run: |
         cd build
-        cmake --build . --config Release
+        cmake --build . --config Release --parallel 2
         
     - name: Verify executable (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest' && success()
       run: |
         file build/mem_trainer
         ldd build/mem_trainer | grep -E 'ssl|pq'
         
     - name: Verify executable (Windows)
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest' && success()
       shell: cmd
       run: |
         cd build

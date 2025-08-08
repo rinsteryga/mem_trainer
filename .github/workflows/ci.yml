@@ -7,42 +7,15 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 45  # Увеличиваем таймаут
-    
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Setup VCPKG (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: pwsh
-      run: |
-        # Устанавливаем только необходимые компоненты
-        $vcpkgRoot = "C:\vcpkg"
-        if (Test-Path $vcpkgRoot) { Remove-Item -Recurse -Force $vcpkgRoot }
-        
-        # Используем более быстрый способ установки vcpkg
-        git clone https://github.com/microsoft/vcpkg $vcpkgRoot
-        & "$vcpkgRoot\bootstrap-vcpkg.bat" -disableMetrics
-        
-        # Устанавливаем только необходимые пакеты
-        & "$vcpkgRoot\vcpkg.exe" install \
-          openssl:x64-mingw-static \
-          libpq:x64-mingw-static \
-          --triplet x64-mingw-static \
-          --binarycaching \
-          --clean-after-build
-        
-        echo "$vcpkgRoot" | Out-File -FilePath $env:GITHUB_PATH -Append
-        echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
-    
-    - name: Install dependencies (Linux)
-      if: matrix.os == 'ubuntu-latest'
+
+    - name: Install dependencies
       run: |
         sudo apt-get update -q
         sudo apt-get install -y --no-install-recommends \
@@ -51,47 +24,58 @@ jobs:
           g++ \
           cmake \
           ninja-build
-        
-    - name: Setup MinGW (Windows)
-      if: matrix.os == 'windows-latest'
+
+    - name: Configure and Build
+      run: |
+        mkdir -p build && cd build
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build . --parallel 2
+
+    - name: Verify executable
+      run: |
+        file build/mem_trainer
+        ldd build/mem_trainer | grep -E 'ssl|pq'
+
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSYS2 and MinGW
       uses: msys2/setup-msys2@v2
       with:
-        update: false  # Отключаем автоматическое обновление для экономии времени
+        update: false
         install: >-
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-ninja
-        
-    - name: Configure CMake
+          mingw-w64-x86_64-ccache
+
+    - name: Setup VCPKG
       shell: bash
       run: |
-        mkdir -p build
-        cd build
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake .. -G "Ninja" \
-            -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake \
-            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
-            -DCMAKE_C_COMPILER=gcc \
-            -DCMAKE_CXX_COMPILER=g++ \
-            -DCMAKE_MAKE_PROGRAM=ninja
-        else
-          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-        fi
-        
-    - name: Build
+        git clone https://github.com/microsoft/vcpkg
+        cd vcpkg
+        ./bootstrap-vcpkg.sh -disableMetrics
+        ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static --triplet=x64-mingw-static
+        echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
+
+    - name: Configure and Build
       shell: bash
       run: |
-        cd build
-        cmake --build . --config Release --parallel 2
-        
-    - name: Verify executable (Linux)
-      if: matrix.os == 'ubuntu-latest' && success()
-      run: |
-        file build/mem_trainer
-        ldd build/mem_trainer | grep -E 'ssl|pq'
-        
-    - name: Verify executable (Windows)
-      if: matrix.os == 'windows-latest' && success()
+        mkdir -p build && cd build
+        cmake -G Ninja \
+          -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
+          -DCMAKE_C_COMPILER=gcc \
+          -DCMAKE_CXX_COMPILER=g++ \
+          -DCMAKE_MAKE_PROGRAM=ninja ..
+        cmake --build . --parallel 2
+
+    - name: Verify executable
       shell: cmd
       run: |
         cd build

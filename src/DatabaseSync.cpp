@@ -20,7 +20,7 @@ DatabaseSync::DatabaseSync()
     {
         throw std::runtime_error("Invalid database configuration in config.ini");
     }
-    std::cout << "Using config file connection\n";
+    std::cout << "Using config.ini file connection\n";
 }
 
 DatabaseSync::~DatabaseSync()
@@ -105,15 +105,11 @@ bool DatabaseSync::connect()
 
     if (PQstatus(db_connection.get()) != CONNECTION_OK)
     {
+        std::cerr << "PQerrorMessage: " << PQerrorMessage(db_connection.get()) << std::endl;
         return false;
     }
 
     return true;
-}
-
-PGconn *DatabaseSync::get_connection() const
-{
-    return db_connection.get();
 }
 
 PGresult *DatabaseSync::execute_params(const char *query,

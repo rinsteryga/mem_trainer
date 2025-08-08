@@ -22,7 +22,7 @@ public:
 
     std::string parse_config_file();
     bool connect();
-    PGconn* get_connection() const;
+    inline PGconn* get_connection() const { return db_connection.get(); }
     bool save_progress(uint32_t user_id, uint32_t sequence_length, float success_rate);
     bool update_difficulty(uint32_t user_id, uint32_t new_level);
     bool update_score(uint32_t user_id, uint32_t score_delta);

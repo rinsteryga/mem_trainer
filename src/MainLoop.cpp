@@ -308,6 +308,11 @@ void MainLoop::update_difficulty_if_needed(TaskGenerator::Difficulty difficulty,
         uint32_t new_level = static_cast<uint32_t>(difficulty) + 1;
         db_sync.update_difficulty(current_user_id, new_level);
     }
+    else if (success_rate < 0.3f && difficulty != TaskGenerator::Difficulty::EASY)
+    {
+        uint32_t new_level = static_cast<uint32_t>(difficulty) - 1;
+        db_sync.update_difficulty(current_user_id, new_level);
+    }
 }
 
 void MainLoop::print_results(uint32_t correct, std::size_t total, float success_rate,

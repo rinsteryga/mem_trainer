@@ -56,7 +56,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(size_t len
             const float choice = dist(gen);
             if (choice < 0.4f)
             {
-                result.push_back(::generate_random_number()); // Используем вашу функцию
+                result.push_back(::generate_random_number());
             }
             else if (choice < 0.7f)
             {

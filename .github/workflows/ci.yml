@@ -1,40 +1,71 @@
-name: CI Build
+name: CMake Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  windows-build:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     
-    - name: Setup vcpkg
-      run: |
-        git clone https://github.com/microsoft/vcpkg.git
-        cd vcpkg
-        ./bootstrap-vcpkg.bat
-        ./vcpkg install openssl:x64-windows-static libpq:x64-windows-static
-        
-    - name: Build with MinGW
-      run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"
-        cmake --build build --config Release
-
-  linux-build:
-    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-  
-    - name: Install dependencies
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup VCPKG (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/microsoft/vcpkg/archive/refs/tags/2025.07.25.zip" -OutFile "vcpkg.zip"
+        Expand-Archive -Path "vcpkg.zip" -DestinationPath "C:/"
+        Rename-Item -Path "C:/vcpkg-2025.07.25" -NewName "C:/vcpkg"
+        & "C:/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
+        & "C:/vcpkg/vcpkg.exe" install openssl:x64-mingw-static libpq:x64-mingw-static --triplet x64-mingw-static
+        
+    - name: Install dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          libpq-dev \
-          libssl-dev \
-          g++ \
-          cmake
+        sudo apt-get install -y libssl-dev libpq-dev g++ cmake
+        
+    - name: Setup MinGW (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: "mingw-w64-x86_64-gcc cmake"
+        
+    - name: Configure CMake
+      shell: bash
+      run: |
+        mkdir -p build
+        cd build
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-static -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/g++.exe
+        else
+          cmake ..
+        fi
         
     - name: Build
+      shell: bash
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --config Release
+        cd build
+        cmake --build . --config Release
+        
+    - name: Verify executable (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        file build/mem_trainer
+        ldd build/mem_trainer | grep -E 'ssl|pq'
+        
+    - name: Verify executable (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: cmd
+      run: |
+        cd build
+        dir /s /b *.exe
+        dumpbin /DEPENDENTS Release\mem_trainer.exe | findstr /i "ssl pq"

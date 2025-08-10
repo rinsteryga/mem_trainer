@@ -18,11 +18,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends
-            libssl-dev
-            libpq-dev
-            g++
-            cmake
+          sudo apt-get install -y --no-install-recommends \
+            libssl-dev \
+            libpq-dev \
+            g++ \
+            cmake \
             ninja-build
 
       - name: Configure
@@ -61,7 +61,11 @@ jobs:
       - name: Get MinGW path
         shell: bash
         run: |
-          echo "MINGW_PATH=$(cygpath -w $(which gcc) | sed 's/\\mingw64\\\\bin\\\\gcc.exe//')" >> $GITHUB_ENV
+          # Получаем путь к gcc и преобразуем в Windows формат
+          MINGW_PATH_WIN=$(cygpath -w $(dirname $(which gcc)))
+          echo "MINGW_PATH=$MINGW_PATH_WIN" >> $GITHUB_ENV
+          echo "CMAKE_C_COMPILER=$MINGW_PATH_WIN\\bin\\gcc.exe" >> $GITHUB_ENV
+          echo "CMAKE_CXX_COMPILER=$MINGW_PATH_WIN\\bin\\g++.exe" >> $GITHUB_ENV
 
       - name: Setup vcpkg
         shell: bash
@@ -70,21 +74,21 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.bat
           ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static --triplet=x64-mingw-static
-          echo "VCPKG_ROOT=${{ github.workspace }}\\vcpkg" >> $env:GITHUB_ENV
-          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $env:GITHUB_ENV
+          echo "VCPKG_ROOT=${GITHUB_WORKSPACE}\\vcpkg" >> $GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $GITHUB_ENV
 
       - name: Configure with vcpkg
         shell: bash
         run: |
           mkdir build
           cd build
-          cmake -G Ninja
-            -DCMAKE_BUILD_TYPE=Release
-            -DVCPKG_TARGET_TRIPLET=x64-mingw-static
-            -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE"
-            -DCMAKE_C_COMPILER="$MINGW_PATH\\mingw64\\bin\\gcc.exe"
-            -DCMAKE_CXX_COMPILER="$MINGW_PATH\\mingw64\\bin\\g++.exe"
-            -DVCPKG_ROOT="$VCPKG_ROOT"
+          cmake -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
+            -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
+            -DCMAKE_C_COMPILER="$CMAKE_C_COMPILER" \
+            -DCMAKE_CXX_COMPILER="$CMAKE_CXX_COMPILER" \
+            -DVCPKG_ROOT="$VCPKG_ROOT" \
             ..
 
       - name: Build

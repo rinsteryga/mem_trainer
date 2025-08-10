@@ -1,4 +1,4 @@
-#include "include\MainLoop.hpp"
+#include "include/MainLoop.hpp"
 
 int main(int argc, char** argv){
     MainLoop app;

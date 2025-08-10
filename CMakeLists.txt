@@ -124,6 +124,15 @@ else()
     )
 endif()
 
+if(EXISTS "${PROJECT_SOURCE_DIR}/config.ini")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${PROJECT_SOURCE_DIR}/config.ini"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMENT "Copying config.ini to output directory"
+    )
+endif()
+
 message(STATUS "OpenSSL includes: ${OPENSSL_INCLUDE_DIR}")
 message(STATUS "OpenSSL libraries: ${OPENSSL_SSL_LIBRARY};${OPENSSL_CRYPTO_LIBRARY}")
 message(STATUS "PostgreSQL library: ${POSTGRESQL_LIBRARY}")

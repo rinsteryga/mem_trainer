@@ -1,7 +1,7 @@
 #pragma once
 
-#include "..\include\DatabaseSync.hpp"
-#include "..\include\TaskGenerator.hpp"
+#include "../include/DatabaseSync.hpp"
+#include "../include/TaskGenerator.hpp"
 
 #include <memory>
 #include <libpq-fe.h>

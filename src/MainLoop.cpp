@@ -1,5 +1,5 @@
-#include "..\include\MainLoop.hpp"
-#include "..\include\Menu.hpp"
+#include "../include/MainLoop.hpp"
+#include "../include/acc_prof.h"
 
 #include <iostream>
 #include <string>

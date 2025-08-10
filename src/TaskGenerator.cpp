@@ -1,5 +1,5 @@
-#include "..\include\TaskGenerator.hpp"
-#include "..\include\RandomGenerators.hpp"
+#include "../include/TaskGenerator.hpp"
+#include "../include/RandomGenerators.hpp"
 
 #include <random>
 #include <algorithm>

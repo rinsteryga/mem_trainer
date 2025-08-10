@@ -1,4 +1,4 @@
-#include "..\include\RandomGenerators.hpp"
+#include "../include/RandomGenerators.hpp"
 
 #include <random>
 #include <algorithm>

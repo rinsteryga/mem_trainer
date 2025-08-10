@@ -1,4 +1,4 @@
-#include "..\include\DatabaseSync.hpp"
+#include "../include/DatabaseSync.hpp"
 
 #include <iostream>
 #include <fstream>

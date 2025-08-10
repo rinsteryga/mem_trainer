@@ -135,8 +135,6 @@ if(EXISTS "${CONFIG_IN_FILE}")
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMENT "Copying config.ini to output directory"
     )
-else()
-    message(WARNING "Source config file '${CONFIG_IN_FILE}' not found. config.ini will not be generated or copied.")
 endif()
 
 message(STATUS "OpenSSL includes: ${OPENSSL_INCLUDE_DIR}")

@@ -12,72 +12,89 @@ jobs:
     timeout-minutes: 30
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update -q
-        sudo apt-get install -y --no-install-recommends \
-          libssl-dev \
-          libpq-dev \
-          g++ \
-          cmake \
-          ninja-build
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libssl-dev \
+            libpq-dev \
+            g++ \
+            cmake \
+            ninja-build
 
-    - name: Configure and Build
-      run: |
-        mkdir -p build && cd build
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build . --parallel 2
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
 
-    - name: Verify executable
-      run: |
-        file build/mem_trainer
-        ldd build/mem_trainer | grep -E 'ssl|pq'
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --parallel
+
+      - name: Verify executable
+        run: |
+          file build/mem_trainer
+          ldd build/mem_trainer | grep -E "(ssl|pq)"
 
   build-windows:
     runs-on: windows-latest
     timeout-minutes: 45
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup MSYS2 and MinGW
-      uses: msys2/setup-msys2@v2
-      with:
-        update: false
-        install: >-
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-ninja
-          mingw-w64-x86_64-ccache
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
 
-    - name: Setup VCPKG
-      shell: bash
-      run: |
-        git clone https://github.com/microsoft/vcpkg
-        cd vcpkg
-        ./bootstrap-vcpkg.sh -disableMetrics
-        ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static --triplet=x64-mingw-static
-        echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
+      - name: Get MinGW path
+        shell: bash
+        run: |
+          echo "MINGW_PATH=$(cygpath -w $(which gcc) | sed 's/\\mingw64\\\\bin\\\\gcc.exe//')" >> $GITHUB_ENV
 
-    - name: Configure and Build
-      shell: bash
-      run: |
-        mkdir -p build && cd build
-        cmake -G Ninja \
-          -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake \
-          -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
-          -DCMAKE_C_COMPILER=gcc \
-          -DCMAKE_CXX_COMPILER=g++ \
-          -DCMAKE_MAKE_PROGRAM=ninja ..
-        cmake --build . --parallel 2
+      - name: Setup vcpkg
+        shell: bash
+        run: |
+          git clone https://github.com/microsoft/vcpkg
+          cd vcpkg
+          ./bootstrap-vcpkg.bat
+          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static --triplet=x64-mingw-static
+          echo "VCPKG_ROOT=${{ github.workspace }}\\vcpkg" >> $env:GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $env:GITHUB_ENV
 
-    - name: Verify executable
-      shell: cmd
-      run: |
-        cd build
-        dir /s /b *.exe
-        dumpbin /DEPENDENTS Release\mem_trainer.exe | findstr /i "ssl pq"
+      - name: Configure with vcpkg
+        shell: bash
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
+            -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
+            -DCMAKE_C_COMPILER="$MINGW_PATH\\mingw64\\bin\\gcc.exe" \
+            -DCMAKE_CXX_COMPILER="$MINGW_PATH\\mingw64\\bin\\g++.exe" \
+            -DVCPKG_ROOT="$VCPKG_ROOT" \
+            ..
+
+      - name: Build
+        shell: bash
+        run: |
+          cd build
+          cmake --build . --parallel
+
+      - name: Verify executable
+        run: |
+          cd build
+          dir *.exe
+          bash -c "ldd mem_trainer.exe | grep -i 'ssl\|pq'"

@@ -5,43 +5,52 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(WIN32)
-    set(VCPKG_ROOT "C:/vcpkg-2025.07.25" CACHE PATH "VCPKG root directory")
+    if(NOT DEFINED VCPKG_ROOT)
+        set(VCPKG_ROOT "C:/vcpkg-2025.07.25" CACHE PATH "VCPKG root directory")
+    endif()
+
     set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
     set(VCPKG_TARGET_TRIPLET "x64-mingw-static")
-    set(CMAKE_C_COMPILER "C:/mingw64/bin/gcc.exe")
-    set(CMAKE_CXX_COMPILER "C:/mingw64/bin/g++.exe")
+
     set(INSTALL_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}")
+
     find_path(OPENSSL_INCLUDE_DIR openssl/ssl.h
       PATHS "${INSTALL_DIR}/include"
       REQUIRED
       NO_DEFAULT_PATH
     )
+
     find_library(OPENSSL_SSL_LIBRARY ssl
       PATHS "${INSTALL_DIR}/lib"
       REQUIRED
       NO_DEFAULT_PATH
     )
+
     find_library(OPENSSL_CRYPTO_LIBRARY crypto
       PATHS "${INSTALL_DIR}/lib"
       REQUIRED
       NO_DEFAULT_PATH
     )
+
     find_path(POSTGRESQL_INCLUDE_DIR libpq-fe.h
       PATHS "${INSTALL_DIR}/include"
       REQUIRED
       NO_DEFAULT_PATH
     )
+
     find_library(POSTGRESQL_LIBRARY pq
       PATHS "${INSTALL_DIR}/lib"
       REQUIRED
       NO_DEFAULT_PATH
     )
+
     add_library(OpenSSL::SSL STATIC IMPORTED)
     set_target_properties(OpenSSL::SSL PROPERTIES
       IMPORTED_LOCATION "${OPENSSL_SSL_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES "${OPENSSL_INCLUDE_DIR}"
       INTERFACE_LINK_LIBRARIES "${OPENSSL_CRYPTO_LIBRARY}"
     )
+
     add_library(PostgreSQL::PQ STATIC IMPORTED)
     set_target_properties(PostgreSQL::PQ PROPERTIES
       IMPORTED_LOCATION "${POSTGRESQL_LIBRARY}"
@@ -93,10 +102,12 @@ if(WIN32)
         ${POSTGRESQL_INCLUDE_DIR}
         ${OPENSSL_INCLUDE_DIR}
     )
+
     target_link_libraries(${PROJECT_NAME} PRIVATE
         PostgreSQL::PQ
         OpenSSL::SSL
     )
+
     target_link_options(${PROJECT_NAME} PRIVATE 
         -static
         -static-libgcc 
@@ -106,6 +117,7 @@ else()
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${PostgreSQL_INCLUDE_DIRS}
     )
+
     target_link_libraries(${PROJECT_NAME} PRIVATE
         PostgreSQL::PQ
         OpenSSL::SSL

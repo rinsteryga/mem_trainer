@@ -58,15 +58,6 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
 
-      - name: Get MinGW path
-        shell: bash
-        run: |
-          # Получаем путь к gcc и преобразуем в Windows формат
-          MINGW_PATH_WIN=$(cygpath -w $(dirname $(which gcc)))
-          echo "MINGW_PATH=$MINGW_PATH_WIN" >> $GITHUB_ENV
-          echo "CMAKE_C_COMPILER=$MINGW_PATH_WIN\\bin\\gcc.exe" >> $GITHUB_ENV
-          echo "CMAKE_CXX_COMPILER=$MINGW_PATH_WIN\\bin\\g++.exe" >> $GITHUB_ENV
-
       - name: Setup vcpkg
         shell: bash
         run: |
@@ -74,8 +65,8 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.bat
           ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static --triplet=x64-mingw-static
-          echo "VCPKG_ROOT=${GITHUB_WORKSPACE}\\vcpkg" >> $GITHUB_ENV
-          echo "CMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $GITHUB_ENV
+          echo "VCPKG_ROOT=${{ github.workspace }}\\vcpkg" >> $env:GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $env:GITHUB_ENV
 
       - name: Configure with vcpkg
         shell: bash
@@ -86,8 +77,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
-            -DCMAKE_C_COMPILER="$CMAKE_C_COMPILER" \
-            -DCMAKE_CXX_COMPILER="$CMAKE_CXX_COMPILER" \
             -DVCPKG_ROOT="$VCPKG_ROOT" \
             ..
 

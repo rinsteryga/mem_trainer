@@ -18,11 +18,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends \
-            libssl-dev \
-            libpq-dev \
-            g++ \
-            cmake \
+          sudo apt-get install -y --no-install-recommends
+            libssl-dev
+            libpq-dev
+            g++
+            cmake
             ninja-build
 
       - name: Configure
@@ -78,13 +78,13 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
-            -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
-            -DCMAKE_C_COMPILER="$MINGW_PATH\\mingw64\\bin\\gcc.exe" \
-            -DCMAKE_CXX_COMPILER="$MINGW_PATH\\mingw64\\bin\\g++.exe" \
-            -DVCPKG_ROOT="$VCPKG_ROOT" \
+          cmake -G Ninja
+            -DCMAKE_BUILD_TYPE=Release
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static
+            -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE"
+            -DCMAKE_C_COMPILER="$MINGW_PATH\\mingw64\\bin\\gcc.exe"
+            -DCMAKE_CXX_COMPILER="$MINGW_PATH\\mingw64\\bin\\g++.exe"
+            -DVCPKG_ROOT="$VCPKG_ROOT"
             ..
 
       - name: Build

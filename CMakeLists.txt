@@ -6,7 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(WIN32)
     if(NOT DEFINED VCPKG_ROOT)
-        set(VCPKG_ROOT "C:/vcpkg-2025.07.25" CACHE PATH "VCPKG root directory")
+        set(VCPKG_ROOT "${CMAKE_SOURCE_DIR}/vcpkg" CACHE PATH "VCPKG root directory")
     endif()
 
     set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")

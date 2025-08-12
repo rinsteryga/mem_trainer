@@ -1,4 +1,5 @@
 #include "../include/DatabaseSync.hpp"
+#include "../include/Menu.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -20,7 +21,8 @@ DatabaseSync::DatabaseSync()
     {
         throw std::runtime_error("Invalid database configuration in config.ini");
     }
-    std::cout << "Using config.ini file connection\n";
+    auto menu = std::make_unique<Menu>();
+    menu->print_message("Using config.ini file connection\n");
 }
 
 DatabaseSync::~DatabaseSync()

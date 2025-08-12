@@ -18,12 +18,29 @@ MainLoop::MainLoop()
 {
     try
     {
-        if (!db_sync.connect())
-        {
-            throw std::runtime_error("Failed to connect to database");
-        }
         auto menu = std::make_unique<Menu>();
-
+        uint16_t attempts{0};
+        bool connected{false};
+        while (attempts < 3 && !connected)
+        {
+            if (db_sync.connect())
+            {
+                connected = true;
+            }
+            else
+            {
+                attempts++;
+                if (attempts < 3)
+                {
+                    menu->print_message("Retrying connection... (" + std::to_string(attempts) + "/3)\n");
+                    std::this_thread::sleep_for(std::chrono::seconds(2));
+                }
+            }
+        }
+        if (!connected)
+        {
+            throw std::runtime_error("Failed to connect to database after 3 attempts");
+        }
         menu->print_message("Connected to database successfully.\n");
     }
     catch (const std::exception &e)
@@ -146,16 +163,23 @@ void MainLoop::start_training()
     std::ostringstream oss;
     oss << "\n\nYou have " << memorization_time << " seconds to remember...\n";
     menu->print_message(oss.str());
-    while (memorization_time > 0)
+    auto start_time = std::chrono::steady_clock::now();
+    auto end_time = start_time + std::chrono::seconds(memorization_time);
+
+    while (std::chrono::steady_clock::now() < end_time)
     {
+        auto remaining = std::chrono::duration_cast<std::chrono::seconds>(
+                             end_time - std::chrono::steady_clock::now())
+                             .count();
+
         std::ostringstream oss;
-        oss << "\rTime left: " << memorization_time << " seconds";
+        oss << "\rTime left: " << remaining << " seconds";
         menu->print_message(oss.str());
         std::cout << std::flush;
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        memorization_time--;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    std::cout << std::endl;
 
     clear_screen();
     auto user_answers = prompt_user_input();
@@ -403,7 +427,13 @@ void MainLoop::run()
         menu->print_auth_menu();
 
         uint32_t choice;
-        std::cin >> choice;
+        if (!(std::cin >> choice))
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            menu->print_message("Please enter a number.\n");
+            continue;
+        }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice)
@@ -430,7 +460,13 @@ void MainLoop::run()
         menu->print_main_menu();
 
         uint32_t choice;
-        std::cin >> choice;
+        if (!(std::cin >> choice))
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            menu->print_message("Please enter a number\n");
+            continue;
+        }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice)

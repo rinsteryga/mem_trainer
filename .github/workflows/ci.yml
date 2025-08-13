@@ -50,6 +50,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
@@ -59,26 +61,49 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-pkg-config
 
-      - name: Setup vcpkg (simple)
+      - name: Install vcpkg
         shell: bash
         run: |
-          git clone https://github.com/microsoft/vcpkg
+          curl -L -o vcpkg.tar.gz https://github.com/microsoft/vcpkg/archive/refs/tags/2024.06.12.tar.gz
+          tar xzf vcpkg.tar.gz
+          mv vcpkg-2024.06.12 vcpkg
+          rm vcpkg.tar.gz
+          
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
           
-          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
-          
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
-      - name: Build
+      - name: Install dependencies
+        shell: bash
+        run: |
+          cd vcpkg
+          ./vcpkg install \
+            --triplet=x64-mingw-static \
+            --host-triplet=x64-mingw-static \
+            --recurse \
+            --clean-after-build \
+            openssl libpq
+
+      - name: Configure and build
         shell: bash
         run: |
           mkdir build && cd build
           cmake -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
           cmake --build . --parallel
+
+      - name: Verify installation
+        shell: bash
+        run: |
+          cd vcpkg
+          ./vcpkg list
+          ls -la installed/x64-mingw-static/lib/libssl.a
+          ls -la installed/x64-mingw-static/lib/libpq.a

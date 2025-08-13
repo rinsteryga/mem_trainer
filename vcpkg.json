@@ -2,8 +2,13 @@
   "name": "mem-trainer",
   "version": "0.1.0",
   "dependencies": [
-    "openssl",
-    "libpq"
-  ],
-  "builtin-baseline": "d4b65a2b83ae6c3526acd1c6f3b51aff2a884533"
+    {
+      "name": "openssl",
+      "version>=": "3.0.0"
+    },
+    {
+      "name": "libpq",
+      "version>=": "14.0"
+    }
+  ]
 }

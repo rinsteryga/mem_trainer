@@ -48,7 +48,7 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Checkout code
+      - name: Checkout code (with vcpkg.json)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -61,17 +61,14 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-pkg-config
 
-      - name: Install vcpkg
+      - name: Setup vcpkg
         shell: bash
         run: |
-          curl -L -o vcpkg.tar.gz https://github.com/microsoft/vcpkg/archive/refs/tags/2024.06.12.tar.gz
-          tar xzf vcpkg.tar.gz
-          mv vcpkg-2024.06.12 vcpkg
-          rm vcpkg.tar.gz
-          
+          git clone https://github.com/microsoft/vcpkg
           cd vcpkg
+          git checkout d4b65a2b83ae6c3526acd1c6f3b51aff2a884533
+          
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
           
@@ -85,9 +82,8 @@ jobs:
           ./vcpkg install \
             --triplet=x64-mingw-static \
             --host-triplet=x64-mingw-static \
-            --recurse \
-            --clean-after-build \
-            openssl libpq
+            --x-manifest-root="$GITHUB_WORKSPACE" \
+            --x-install-root=installed
 
       - name: Configure and build
         shell: bash
@@ -97,13 +93,18 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
             -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
+            -DVCPKG_INSTALLED_DIR="$VCPKG_ROOT/installed" \
             ..
           cmake --build . --parallel
 
       - name: Verify installation
         shell: bash
         run: |
-          cd vcpkg
-          ./vcpkg list
-          ls -la installed/x64-mingw-static/lib/libssl.a
-          ls -la installed/x64-mingw-static/lib/libpq.a
+          echo "=== Installed packages ==="
+          $VCPKG_ROOT/vcpkg list --x-install-root=$VCPKG_ROOT/installed
+          
+          echo "=== OpenSSL ==="
+          ls -la $VCPKG_ROOT/installed/x64-mingw-static/lib/libssl.a
+          
+          echo "=== PostgreSQL ==="
+          ls -la $VCPKG_ROOT/installed/x64-mingw-static/lib/libpq.a

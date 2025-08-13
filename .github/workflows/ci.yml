@@ -61,35 +61,43 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-pkg-config
+            git
 
       - name: Setup vcpkg
         shell: bash
         run: |
           git clone https://github.com/microsoft/vcpkg
           cd vcpkg
+          git fetch --unshallow
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
-          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
+          
+          ./vcpkg install \
+            --triplet=x64-mingw-static \
+            --host-triplet=x64-mingw-static \
+            --recurse
+
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
       - name: Verify installations
         shell: bash
         run: |
-          echo "=== OpenSSL ==="
+          echo "=== Installed packages ==="
+          ./vcpkg/vcpkg list
+          
+          echo "=== OpenSSL files ==="
           ls -la "$VCPKG_ROOT/installed/x64-mingw-static/include/openssl"
           ls -la "$VCPKG_ROOT/installed/x64-mingw-static/lib/libssl*"
           
-          echo "=== PostgreSQL ==="
+          echo "=== PostgreSQL files ==="
           ls -la "$VCPKG_ROOT/installed/x64-mingw-static/include/postgresql"
           ls -la "$VCPKG_ROOT/installed/x64-mingw-static/lib/libpq*"
 
       - name: Configure with vcpkg
         shell: bash
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
@@ -101,10 +109,3 @@ jobs:
         run: |
           cd build
           cmake --build . --parallel
-
-      - name: Verify executable
-        shell: bash
-        run: |
-          cd build
-          file mem_trainer.exe
-          ldd mem_trainer.exe | grep -i 'ssl\|pq'

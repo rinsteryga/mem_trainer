@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           cd vcpkg
-          ./vcpkg install openssl libpq --triplet=x64-mingw-static
+          ./vcpkg install --triplet=x64-mingw-static
 
       - name: Configure and build
         shell: bash

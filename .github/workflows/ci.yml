@@ -50,8 +50,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
@@ -61,40 +59,28 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
-            git
 
       - name: Setup vcpkg
         shell: bash
         run: |
-          git clone https://github.com/microsoft/vcpkg
+          git clone --depth=1 https://github.com/microsoft/vcpkg
           cd vcpkg
-          git fetch --unshallow
+          
+          git fetch origin master:master --depth=1
+          
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
           
           ./vcpkg install \
+            openssl:x64-mingw-static \
+            libpq:x64-mingw-static \
             --triplet=x64-mingw-static \
-            --host-triplet=x64-mingw-static \
-            --recurse
-
+            --host-triplet=x64-mingw-static
+          
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
-      - name: Verify installations
-        shell: bash
-        run: |
-          echo "=== Installed packages ==="
-          ./vcpkg/vcpkg list
-          
-          echo "=== OpenSSL files ==="
-          ls -la "$VCPKG_ROOT/installed/x64-mingw-static/include/openssl"
-          ls -la "$VCPKG_ROOT/installed/x64-mingw-static/lib/libssl*"
-          
-          echo "=== PostgreSQL files ==="
-          ls -la "$VCPKG_ROOT/installed/x64-mingw-static/include/postgresql"
-          ls -la "$VCPKG_ROOT/installed/x64-mingw-static/lib/libpq*"
-
-      - name: Configure with vcpkg
+      - name: Configure and build
         shell: bash
         run: |
           mkdir build && cd build
@@ -103,9 +89,4 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
             -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
-
-      - name: Build
-        shell: bash
-        run: |
-          cd build
           cmake --build . --parallel

@@ -199,7 +199,7 @@ void MainLoop::start_training()
     print_results(correct, sequence.size(), success_rate, score, difficulty);
 }
 
-void MainLoop::display_training_header(TaskGenerator::Difficulty difficulty, size_t sequence_length)
+void MainLoop::display_training_header(TaskGenerator::Difficulty difficulty, std::size_t sequence_length)
 {
     auto menu = std::make_unique<Menu>();
     menu->print_message("\n=== Memory Training ===\n");
@@ -259,8 +259,8 @@ std::vector<std::string> MainLoop::prompt_user_input()
 uint32_t MainLoop::check_answers(const std::vector<TaskGenerator::TaskItem> &sequence,
                                  const std::vector<std::string> &user_answers) const
 {
-    uint32_t correct = 0;
-    for (size_t i{0}; i < sequence.size(); ++i)
+    uint32_t correct{0};
+    for (std::size_t i{0}; i < sequence.size(); ++i)
     {
         if (i < user_answers.size() && !user_answers[i].empty())
         {
@@ -311,7 +311,7 @@ uint32_t MainLoop::calculate_score(float success_rate, TaskGenerator::Difficulty
     return static_cast<uint32_t>(success_rate * 100 * (static_cast<uint32_t>(difficulty) + 1));
 }
 
-void MainLoop::save_training_results(size_t sequence_length, float success_rate, uint32_t score)
+void MainLoop::save_training_results(std::size_t sequence_length, float success_rate, uint32_t score)
 {
     const char *progress_params[3] = {
         std::to_string(current_user_id).c_str(),
@@ -387,7 +387,7 @@ void MainLoop::show_leaderboard() const
     }
     else
     {
-        for (std::size_t i = 0; i < rows; ++i)
+        for (std::size_t i{0}; i < rows; ++i)
         {
             leaders.emplace_back(
                 PQgetvalue(res, i, 0), // username

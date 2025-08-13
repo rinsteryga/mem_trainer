@@ -63,10 +63,9 @@ jobs:
       - name: Install vcpkg
         shell: bash
         run: |
-          git clone https://github.com/microsoft/vcpkg
+          git clone --depth 1 https://github.com/microsoft/vcpkg
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
-          ./vcpkg integrate install
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
@@ -74,11 +73,7 @@ jobs:
         shell: bash
         run: |
           cd vcpkg
-          ./vcpkg install \
-            --triplet=x64-mingw-static \
-            --clean-after-build \
-            --recurse \
-            openssl libpq
+          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
 
       - name: Configure and build
         shell: bash
@@ -87,13 +82,12 @@ jobs:
           cmake -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
-            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
           cmake --build . --parallel
 
-      - name: Verify installation
+      - name: Verify build
         shell: bash
         run: |
+          file build/mem_trainer.exe
           ls -la vcpkg/installed/x64-mingw-static/lib/libssl.a
           ls -la vcpkg/installed/x64-mingw-static/lib/libpq.a
-          file build/mem_trainer.exe

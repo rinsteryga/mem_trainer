@@ -63,10 +63,11 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg
           cd vcpkg
-          ./bootstrap-vcpkg.bat
+          ./bootstrap-vcpkg.sh -disableMetrics
+          ./vcpkg integrate install
           ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static --triplet=x64-mingw-static
-          echo "VCPKG_ROOT=${{ github.workspace }}\\vcpkg" >> $env:GITHUB_ENV
-          echo "CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $env:GITHUB_ENV
+          echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
       - name: Configure with vcpkg
         shell: bash
@@ -75,9 +76,8 @@ jobs:
           cd build
           cmake -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
-            -DVCPKG_ROOT="$VCPKG_ROOT" \
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
 
       - name: Build
@@ -87,7 +87,8 @@ jobs:
           cmake --build . --parallel
 
       - name: Verify executable
+        shell: bash
         run: |
           cd build
-          dir *.exe
-          bash -c "ldd mem_trainer.exe | grep -i 'ssl\|pq'"
+          file mem_trainer.exe
+          ldd mem_trainer.exe | grep -i 'ssl\|pq'

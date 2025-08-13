@@ -51,10 +51,10 @@ float NumberGenerator::generate_float() noexcept
 char SymbolGenerator::generate_char() noexcept
 {
     constexpr auto size = std::size(symbols);
-    return symbols[generate_integer<size_t>(0, size - 1)];
+    return symbols[generate_integer<std::size_t>(0, size - 1)];
 }
 
-std::string SymbolGenerator::generate_string(size_t length) noexcept
+std::string SymbolGenerator::generate_string(std::size_t length) noexcept
 {
     std::string result;
     result.reserve(length);
@@ -67,5 +67,5 @@ std::string SymbolGenerator::generate_string(size_t length) noexcept
 std::string WordGenerator::generate_word() noexcept
 {
     constexpr auto size = std::size(words);
-    return words[generate_integer<size_t>(0, size - 1)];
+    return words[generate_integer<std::size_t>(0, size - 1)];
 }

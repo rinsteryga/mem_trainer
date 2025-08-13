@@ -1,12 +1,8 @@
 build/
-out/
-bin/
 *.o
 *.a
 *.so
 *.exe
 .vscode/
-.idea/
 config.ini
 *.env
-secrets.*

@@ -7,14 +7,14 @@ skinparam usecase {
   BorderColor #333333
 }
 
-actor "Пользователь" as User <<Human>>
+actor "Player" as User <<Human>>
 
 rectangle "Memory Trainer" {
-  usecase "Авторизация" as UC1
-  usecase "Регистрация" as UC2
-  usecase "Начать тренировку" as UC3
-  usecase "Посмотреть прогресс" as UC4
-  usecase "Просмотреть таблицу лидеров" as UC5
+  usecase "Auth" as UC1
+  usecase "Registration" as UC2
+  usecase "Start training session" as UC3
+  usecase "Check the progress" as UC4
+  usecase "Check the leaderboard" as UC5
   
   User --> UC1
   User --> UC2
@@ -24,10 +24,10 @@ rectangle "Memory Trainer" {
 }
 
 ' Расширенные сценарии
-usecase "Выбрать сложность" as UC6
-usecase "Запомнить последовательность" as UC7
-usecase "Ввести ответ" as UC8
-usecase "Получить результат" as UC9
+usecase "Get the difficulty" as UC6
+usecase "Remember the sequence" as UC7
+usecase "Enter the answer" as UC8
+usecase "Get the result" as UC9
 
 UC3 --> UC6
 UC3 --> UC7

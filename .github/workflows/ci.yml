@@ -60,14 +60,10 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
 
-      - name: Download vcpkg release
+      - name: Install vcpkg
         shell: bash
         run: |
-          curl -L -o vcpkg.zip https://github.com/microsoft/vcpkg/archive/refs/tags/2024.06.12.zip
-          unzip vcpkg.zip
-          mv vcpkg-2024.06.12 vcpkg
-          rm vcpkg.zip
-          
+          git clone https://github.com/microsoft/vcpkg
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
@@ -80,11 +76,10 @@ jobs:
         run: |
           cd vcpkg
           ./vcpkg install \
+            openssl:x64-mingw-static \
+            libpq:x64-mingw-static \
             --triplet=x64-mingw-static \
-            --host-triplet=x64-mingw-static \
-            --x-manifest-root="$GITHUB_WORKSPACE" \
-            --x-install-root=installed \
-            --feature-flags="-manifests"
+            --clean-after-build
 
       - name: Build project
         shell: bash
@@ -97,7 +92,7 @@ jobs:
             ..
           cmake --build . --parallel
 
-      - name: Verify binaries
+      - name: Verify build
         shell: bash
         run: |
           file build/mem_trainer.exe

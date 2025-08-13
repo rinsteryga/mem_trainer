@@ -65,7 +65,7 @@ void Menu::print_leaderboard(const std::vector<std::pair<std::string, std::strin
               << std::setw(20) << "Name"
               << "Score" << RESET << "\n";
 
-    for (std::size_t i = 0; i < leaders.size(); ++i)
+    for (std::size_t i{0}; i < leaders.size(); ++i)
     {
         std::cout << GRAY << ITALIC
                   << std::setw(4) << i + 1

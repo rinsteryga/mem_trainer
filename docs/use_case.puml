@@ -23,7 +23,6 @@ rectangle "Memory Trainer" {
   User --> UC5
 }
 
-' Расширенные сценарии
 usecase "Get the difficulty" as UC6
 usecase "Remember the sequence" as UC7
 usecase "Enter the answer" as UC8

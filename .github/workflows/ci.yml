@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           cd vcpkg
-          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
+          ./vcpkg install openssl libpq --triplet=x64-mingw-static
 
       - name: Configure and build
         shell: bash
@@ -82,6 +82,7 @@ jobs:
           cmake -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
           cmake --build . --parallel
 

@@ -26,6 +26,8 @@ namespace
             return NumberGenerator::generate_uint32();
         case 2:
             return NumberGenerator::generate_float();
+        default:
+            return NumberGenerator::generate_uint16(); // никогда не случится
         }
     }
 }

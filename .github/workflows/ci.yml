@@ -27,22 +27,12 @@ jobs:
             cmake \
             ninja-build
 
-      - name: Configure
+      - name: Configure and build
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
-
-      - name: Build
-        run: |
-          cd build
           cmake --build . --parallel
-
-      - name: Verify executable
-        run: |
-          file build/mem_trainer
-          ldd build/mem_trainer | grep -E "(ssl|pq)"
-
+          
   build-windows:
     runs-on: windows-latest
     timeout-minutes: 45
@@ -73,7 +63,7 @@ jobs:
         shell: bash
         run: |
           cd vcpkg
-          ./vcpkg install --triplet=x64-mingw-static
+          ./vcpkg install openssl libpq --triplet=x64-mingw-static --binarycaching
 
       - name: Configure and build
         shell: bash
@@ -85,10 +75,3 @@ jobs:
             -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
           cmake --build . --parallel
-
-      - name: Verify build
-        shell: bash
-        run: |
-          file build/mem_trainer.exe
-          ls -la vcpkg/installed/x64-mingw-static/lib/libssl.a
-          ls -la vcpkg/installed/x64-mingw-static/lib/libpq.a

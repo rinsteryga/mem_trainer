@@ -6,7 +6,5 @@ build/
 .vscode/
 config.ini
 *.env
-/vcpkg/
-/vcpkg_installed/
 *.user
 *.local

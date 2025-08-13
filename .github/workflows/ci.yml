@@ -60,33 +60,25 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
 
-      - name: Setup vcpkg
+      - name: Setup vcpkg (simple)
         shell: bash
         run: |
-          git clone --depth=1 https://github.com/microsoft/vcpkg
+          git clone https://github.com/microsoft/vcpkg
           cd vcpkg
-          
-          git fetch origin master:master --depth=1
-          
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
           
-          ./vcpkg install \
-            openssl:x64-mingw-static \
-            libpq:x64-mingw-static \
-            --triplet=x64-mingw-static \
-            --host-triplet=x64-mingw-static
+          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
           
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
-      - name: Configure and build
+      - name: Build
         shell: bash
         run: |
           mkdir build && cd build
           cmake -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
-            -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
             ..
           cmake --build . --parallel

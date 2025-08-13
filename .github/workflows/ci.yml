@@ -70,9 +70,7 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
-          
-          ./vcpkg install --triplet=x64-mingw-static
-          
+          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 

@@ -67,7 +67,6 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
-          
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
 
@@ -76,12 +75,12 @@ jobs:
         run: |
           cd vcpkg
           ./vcpkg install \
-            openssl:x64-mingw-static \
-            libpq:x64-mingw-static \
             --triplet=x64-mingw-static \
-            --clean-after-build
+            --clean-after-build \
+            --recurse \
+            openssl libpq
 
-      - name: Build project
+      - name: Configure and build
         shell: bash
         run: |
           mkdir build && cd build
@@ -92,8 +91,9 @@ jobs:
             ..
           cmake --build . --parallel
 
-      - name: Verify build
+      - name: Verify installation
         shell: bash
         run: |
+          ls -la vcpkg/installed/x64-mingw-static/lib/libssl.a
+          ls -la vcpkg/installed/x64-mingw-static/lib/libpq.a
           file build/mem_trainer.exe
-          ls -la vcpkg/installed/x64-mingw-static/lib/lib{ssl,pq}.*

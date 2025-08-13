@@ -53,7 +53,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(std::size_
             std::vector<TaskItem> result;
             result.reserve(length);
 
-            for (std::size_t i = 0; i < length; ++i)
+            for (std::size_t i{0}; i < length; ++i)
             {
                 const float choice = dist(gen);
                 if (choice < 0.4f)
@@ -86,7 +86,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(std::size_
             std::vector<TaskItem> result;
             result.reserve(length);
 
-            for (size_t i = 0; i < length; ++i)
+            for (std::size_t i{0}; i < length; ++i)
             {
                 const float choice = dist(gen);
                 if (choice < 0.5f)
@@ -109,7 +109,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_sequence(std::size_
     }
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_number_sequence(size_t length) const // принимает количество чисел для генерации
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_number_sequence(std::size_t length) const // принимает количество чисел для генерации
 {
     std::vector<TaskItem> result;
     result.reserve(length);
@@ -117,7 +117,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_number_sequence(siz
     return result;
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_symbol_sequence(size_t length) const // принимает количество символов для генерации
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_symbol_sequence(std::size_t length) const // принимает количество символов для генерации
 {
     std::vector<TaskItem> result;
     result.reserve(length);
@@ -127,7 +127,7 @@ std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_symbol_sequence(siz
     return result;
 }
 
-std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_word_sequence(size_t length) const // принимает количество слов для генерации
+std::vector<TaskGenerator::TaskItem> TaskGenerator::generate_word_sequence(std::size_t length) const // принимает количество слов для генерации
 {
     std::vector<TaskItem> result;
     result.reserve(length);

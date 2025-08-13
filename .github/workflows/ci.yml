@@ -48,10 +48,8 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Checkout code (with vcpkg.json)
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
@@ -62,13 +60,15 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
 
-      - name: Setup vcpkg
+      - name: Download vcpkg release
         shell: bash
         run: |
-          git clone https://github.com/microsoft/vcpkg
-          cd vcpkg
-          git checkout d4b65a2b83ae6c3526acd1c6f3b51aff2a884533
+          curl -L -o vcpkg.zip https://github.com/microsoft/vcpkg/archive/refs/tags/2024.06.12.zip
+          unzip vcpkg.zip
+          mv vcpkg-2024.06.12 vcpkg
+          rm vcpkg.zip
           
+          cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg integrate install
           
@@ -83,9 +83,10 @@ jobs:
             --triplet=x64-mingw-static \
             --host-triplet=x64-mingw-static \
             --x-manifest-root="$GITHUB_WORKSPACE" \
-            --x-install-root=installed
+            --x-install-root=installed \
+            --feature-flags="-manifests"
 
-      - name: Configure and build
+      - name: Build project
         shell: bash
         run: |
           mkdir build && cd build
@@ -93,18 +94,11 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
             -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
-            -DVCPKG_INSTALLED_DIR="$VCPKG_ROOT/installed" \
             ..
           cmake --build . --parallel
 
-      - name: Verify installation
+      - name: Verify binaries
         shell: bash
         run: |
-          echo "=== Installed packages ==="
-          $VCPKG_ROOT/vcpkg list --x-install-root=$VCPKG_ROOT/installed
-          
-          echo "=== OpenSSL ==="
-          ls -la $VCPKG_ROOT/installed/x64-mingw-static/lib/libssl.a
-          
-          echo "=== PostgreSQL ==="
-          ls -la $VCPKG_ROOT/installed/x64-mingw-static/lib/libpq.a
+          file build/mem_trainer.exe
+          ls -la vcpkg/installed/x64-mingw-static/lib/lib{ssl,pq}.*

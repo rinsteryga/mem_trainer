@@ -4,5 +4,6 @@
   "dependencies": [
     "openssl",
     "libpq"
-  ]
+  ],
+  "builtin-baseline": "333e0d58bc01544452394f483b5547ecb83af0e5"
 }

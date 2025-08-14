@@ -50,22 +50,22 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
 
-      - name: Install vcpkg
+      - name: Install vcpkg (classic mode)
         shell: bash
         run: |
-          git clone https://github.com/microsoft/vcpkg
+          git clone --depth 1 https://github.com/microsoft/vcpkg
           cd vcpkg
-          git checkout 3426db05b996481ca31e95fff3734cf23e0f51bc
           ./bootstrap-vcpkg.sh -disableMetrics
           echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
           echo "CMAKE_TOOLCHAIN_FILE=$(pwd)/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
-          echo "VCPKG_FEATURE_FLAGS=manifests" >> $GITHUB_ENV
+          # Явно отключаем feature flags
+          echo "VCPKG_FEATURE_FLAGS=-manifests,-versions" >> $GITHUB_ENV
 
       - name: Install dependencies
         shell: bash
         run: |
           cd vcpkg
-          ./vcpkg install --triplet=x64-mingw-static --feature-flags=manifests
+          ./vcpkg install openssl:x64-mingw-static libpq:x64-mingw-static
 
       - name: Configure and build
         shell: bash
@@ -75,6 +75,5 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" \
             -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
-            -DVCPKG_FEATURE_FLAGS=manifests \
             ..
           cmake --build . --parallel
